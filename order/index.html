@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<title>線上點餐 — 濤濤鮮魚舖</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#16404D">
+<link rel="icon" href="../assets/icon-192.png">
+<link rel="apple-touch-icon" href="../assets/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/theme.css">
+<style>
+  body{padding-bottom:84px;background:var(--bg)}
+  .hero{background:linear-gradient(120deg,var(--miku-deep),var(--miku-teal-d));color:#fff;padding:14px 16px 14px}
+  .hrow{display:flex;align-items:flex-start;gap:12px}
+  .hrow .logo{height:52px;width:52px;border-radius:11px;background:#fff;padding:3px;object-fit:contain;flex:none}
+  .hinfo{flex:1;min-width:0}
+  .hname{font-weight:800;font-size:18px}
+  .hmeta{font-size:12px;line-height:1.7;opacity:.92;margin-top:2px}
+  .hmeta a{color:#bff5f3;font-weight:700}
+  .hsoc{display:flex;gap:7px;flex:none}
+  .sic{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(4px)}
+  .sic:hover{background:#fff;color:var(--miku-deep)}
+  .slogan{margin-top:10px;font-size:12.5px;line-height:1.6;font-weight:500;letter-spacing:.3px;white-space:pre-line;
+    background:linear-gradient(90deg,#fff,#bff5f3,#ffd6ea,#fff);-webkit-background-clip:text;background-clip:text;color:transparent;
+    background-size:200% auto;animation:shimmer 6s linear infinite}
+  @keyframes shimmer{to{background-position:200% center}}
+  .hctrl{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .modeseg{display:inline-flex;background:rgba(255,255,255,.14);border-radius:11px;padding:3px;gap:2px}
+  .modeseg button{padding:7px 12px;border-radius:9px;font-weight:700;font-size:13px;color:#fff;white-space:nowrap}
+  .modeseg button.active{background:#fff;color:var(--miku-deep)}
+  .modeseg button.hist{color:#ffd6ea}
+  .catbar{position:sticky;top:0;z-index:15;background:var(--bg);display:flex;gap:8px;overflow-x:auto;padding:12px 14px;box-shadow:0 4px 12px rgba(22,64,77,.05)}
+  .catbar button{white-space:nowrap;padding:8px 14px;border-radius:999px;background:#fff;border:1.5px solid var(--miku-line);font-weight:700;color:var(--text-soft)}
+  .catbar button.active{background:var(--miku-teal);border-color:var(--miku-teal);color:#06343f}
+  .list{padding:6px 14px}
+  .row-item{display:flex;gap:12px;background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:12px;margin-bottom:12px}
+  .row-item .thumb{width:84px;height:84px}
+  .row-item .info{flex:1;min-width:0}
+  .row-item h3{margin:0;font-size:16px;color:var(--miku-deep)}
+  .row-item p{margin:3px 0 0;font-size:13px;color:var(--text-soft);line-height:1.4}
+  .row-item .b{display:flex;align-items:center;margin-top:8px;gap:10px}
+  .row-item .price{font-weight:800;color:var(--miku-pink-d)}
+  .row-item .spacer{flex:1}
+  .addbtn{width:36px;height:36px;border-radius:10px;background:var(--miku-teal);color:#06343f;font-size:22px;font-weight:800}
+  .row-item.off{opacity:.55}
+  .cartbar{position:fixed;bottom:0;left:0;right:0;z-index:30;padding:12px 16px;background:#fff;box-shadow:0 -6px 20px rgba(22,64,77,.14)}
+  .cartbar .btn{width:100%;display:flex;justify-content:space-between}
+  .cat-title{font-weight:800;color:var(--miku-deep);margin:14px 4px 6px;font-size:15px}
+  .citem{padding:10px 0;border-bottom:1px solid var(--miku-line)}
+  .citem-top{display:flex;align-items:center;gap:8px}
+  .citem-note{margin-top:6px;font-size:13px;padding:8px 10px}
+  .store-info{margin:8px 14px 18px;padding:16px;border-radius:14px;background:#fff;box-shadow:var(--shadow);
+    color:var(--text-soft);font-size:13px;line-height:1.9}
+  .store-info b{display:block;color:var(--miku-deep);font-size:15px;margin-bottom:4px}
+  .store-info .socials{margin-top:8px;display:flex;gap:14px}
+  .store-info .socials a{color:var(--miku-teal-d);font-weight:700}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hrow">
+    <img class="logo" src="../assets/taotao_logo.png" alt="">
+    <div class="hinfo">
+      <div class="hname" id="storeName">濤濤鮮魚舖</div>
+      <div class="hmeta" id="storeMeta"></div>
+    </div>
+    <div class="hsoc" id="storeSocial"></div>
+  </div>
+  <div class="slogan" id="slogan"></div>
+  <div class="hctrl">
+    <div class="lang-switch" id="langSwitch"></div>
+    <div class="spacer" style="flex:1"></div>
+    <div class="modeseg" id="modeSeg">
+      <button data-m="dine" id="dineBtn">店內用餐</button>
+      <button data-m="take" id="takeBtn">外帶</button>
+      <button class="hist" data-m="hist" id="histBtn">點餐記錄</button>
+    </div>
+  </div>
+</div>
+
+<div class="catbar" id="catbar"></div>
+<div style="padding:10px 14px 0"><input id="orderSearch" placeholder="🔍 搜尋菜色…" style="background:#fff"></div>
+<div class="list" id="list"></div>
+
+<div class="cartbar hidden" id="cartbar">
+  <button class="btn primary lg" id="openCart">
+    <span id="cartCount">0</span>
+    <span id="cartTotal">NT$0</span>
+  </button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/i18n.js"></script>
+<script src="../assets/js/db.js"></script>
+<script src="../assets/js/util.js"></script>
+<script src="../assets/js/order.js"></script>
+</body>
+</html>

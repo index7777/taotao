@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>候位看板 — 濤濤鮮魚舖</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#16404D">
+<link rel="icon" href="../assets/icon-192.png">
+<link rel="apple-touch-icon" href="../assets/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/theme.css">
+<style>
+  .wrap{max-width:600px;margin:0 auto;padding:18px}
+  .hero{display:flex;align-items:center;gap:12px;background:linear-gradient(120deg,var(--miku-deep),var(--miku-teal-d));color:#fff;border-radius:18px;padding:16px;margin-bottom:14px}
+  .hero img{height:48px;width:48px;border-radius:11px;background:#fff;padding:3px;object-fit:contain}
+  .hero h1{margin:0;font-size:19px}
+  .hero p{margin:2px 0 0;font-size:13px;opacity:.9}
+  .count{text-align:center;margin:6px 0 16px}
+  .count .n{font-size:46px;font-weight:800;color:var(--miku-teal-d);line-height:1}
+  .count .l{color:var(--text-soft);font-weight:700;margin-top:4px}
+  .wlist{display:flex;flex-direction:column;gap:10px}
+  .wrow{display:flex;align-items:center;gap:14px;background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:14px 16px}
+  .wrow .ord{width:34px;height:34px;border-radius:50%;background:var(--miku-light);color:var(--miku-teal-d);display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}
+  .wrow .num{font-size:30px;font-weight:800;color:var(--miku-deep);letter-spacing:2px}
+  .wrow.next{border:2px solid var(--miku-pink)}
+  .wrow.next .num{color:var(--miku-pink-d)}
+  .tagnext{margin-left:auto;background:var(--miku-pink);color:#fff;font-weight:700;font-size:12px;padding:4px 10px;border-radius:999px}
+  .foot{text-align:center;color:var(--text-soft);font-size:13px;margin-top:18px;line-height:1.7}
+  .upd{text-align:center;color:var(--miku-grey);font-size:12px;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <img src="../assets/taotao_logo.png" alt="">
+    <div><h1 id="sName">濤濤鮮魚舖</h1><p>現場候位看板</p></div>
+  </div>
+  <div class="count"><div class="n" id="cnt">0</div><div class="l">組正在候位</div></div>
+  <div class="wlist" id="wlist"></div>
+  <div class="foot">請向服務人員報出您的<b>候位編號</b>，輪到您時將為您帶位。<br>本頁每 10 秒自動更新。</div>
+  <div class="upd" id="upd"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/db.js"></script>
+<script src="../assets/js/util.js"></script>
+<script src="../assets/js/wait.js"></script>
+</body>
+</html>

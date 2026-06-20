@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TaoTao POS — 餐飲點餐系統</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#16404D">
+<link rel="icon" href="./assets/icon-192.png">
+<link rel="apple-touch-icon" href="./assets/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./assets/css/theme.css">
+<style>
+  .hero{max-width:880px;margin:0 auto;padding:30px 20px 60px}
+  .hero h1{font-size:30px;margin:18px 0 6px;color:var(--miku-deep)}
+  .hero p.sub{color:var(--text-soft);margin:0 0 26px}
+  .roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+  .role{display:flex;flex-direction:column;gap:8px;padding:24px;border-radius:var(--radius);
+    background:var(--card);box-shadow:var(--shadow);border:2px solid transparent;transition:.18s}
+  .role:hover{transform:translateY(-3px);border-color:var(--miku-teal);box-shadow:var(--shadow-lg)}
+  .role .ic{font-size:38px}
+  .role h3{margin:4px 0 0;font-size:20px;color:var(--miku-deep)}
+  .role p{margin:0;color:var(--text-soft);font-size:14px;line-height:1.5}
+  .role .go{margin-top:10px;align-self:flex-start}
+  .note{margin-top:30px;padding:16px 18px;border-radius:14px;background:#fff;box-shadow:var(--shadow);font-size:14px;color:var(--text-soft);line-height:1.7}
+  .note b{color:var(--miku-deep)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><img class="logo" src="./assets/taotao_logo.png" alt="TaoTao"> TaoTao POS</div>
+  <div class="spacer"></div>
+  <span class="pill" id="modePill">…</span>
+</div>
+
+<div class="hero">
+  <h1>餐飲點餐系統</h1>
+  <p class="sub">支援桌邊服務與快餐外帶 · QR 自助點餐 · 多語言菜單 · 即時座位連動</p>
+
+  <div class="roles">
+    <a class="role" href="./pos/index.html">
+      <span class="ic">🧾</span>
+      <h3>前台 POS</h3>
+      <p>店員點餐、加退點、座位連動、結帳。適合平板操作。</p>
+      <span class="btn primary go">進入前台</span>
+    </a>
+    <a class="role" href="./admin/index.html">
+      <span class="ic">⚙️</span>
+      <h3>後台管理</h3>
+      <p>菜單編輯、照片上傳、即時開關品項、營收與熱銷報表。</p>
+      <span class="btn deep go">進入後台</span>
+    </a>
+    <a class="role" href="./order/index.html?table=T3">
+      <span class="ic">📱</span>
+      <h3>QR 客人點餐</h3>
+      <p>掃桌上 QR 進入此頁。多語言菜單、自助下單、查看訂單。</p>
+      <span class="btn pink go">模擬掃碼 (3 號桌)</span>
+    </a>
+    <a class="role" href="./reserve/index.html">
+      <span class="ic">📅</span>
+      <h3>線上訂位</h3>
+      <p>店家資訊、營業時段、Google Map 導航；公休與非營業時段自動擋下。</p>
+      <span class="btn deep go">前往訂位</span>
+    </a>
+    <a class="role" href="./wait/index.html">
+      <span class="ic">⏳</span>
+      <h3>候位看板</h3>
+      <p>客人掃碼查看目前候位組數與編號，每 10 秒自動更新。</p>
+      <span class="btn ghost go">開啟看板</span>
+    </a>
+  </div>
+
+  <div class="note" id="modeNote"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./assets/js/config.js"></script>
+<script src="./assets/js/db.js"></script>
+<script src="./assets/js/util.js"></script>
+<script>
+  const pill=document.getElementById("modePill");
+  const note=document.getElementById("modeNote");
+  if(window.MIKU_LIVE){
+    pill.textContent="線上模式 (Supabase)"; pill.className="pill live";
+    note.innerHTML="<b>線上模式：</b>已連接 Supabase，所有裝置即時同步。前台、後台、客人手機的操作會互相連動。";
+  } else {
+    pill.textContent="示範模式"; pill.className="pill demo";
+    note.innerHTML="<b>示範模式：</b>資料存在此瀏覽器，同一台裝置不同分頁會即時連動（例如：前台分頁＋客人點餐分頁）。要做到真正跨裝置同步，請在 <code>assets/js/config.js</code> 填入 Supabase 金鑰。";
+  }
+  if("serviceWorker" in navigator){ navigator.serviceWorker.register("./sw.js").catch(()=>{}); }
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "TaoTao POS 餐飲點餐系統",
+  "short_name": "TaoTao POS",
+  "description": "餐飲業 HTML PWA 點餐 / 結帳 / 後台 / QR 點餐系統",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F4FBFB",
+  "theme_color": "#16404D",
+  "icons": [
+    { "src": "./assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

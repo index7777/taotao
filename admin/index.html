@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>後台管理 — TaoTao POS</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#16404D">
+<link rel="icon" href="../assets/icon-192.png">
+<link rel="apple-touch-icon" href="../assets/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/theme.css">
+<style>
+  .wrap{max-width:1100px;margin:0 auto;padding:16px}
+  .subtabs{position:sticky;top:56px;z-index:18;display:flex;gap:8px;flex-wrap:wrap;background:var(--bg);padding:10px 0;margin-bottom:12px;border-bottom:1px solid var(--miku-line)}
+  .subtabs button{padding:9px 16px;border-radius:999px;background:#fff;border:1.5px solid var(--miku-line);font-weight:700;color:var(--text-soft)}
+  .subtabs button.active{background:var(--miku-deep);border-color:var(--miku-deep);color:#fff}
+  .view{display:none} .view.active{display:block}
+  .catblock{margin-bottom:22px}
+  .catblock h3{color:var(--miku-deep);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .mrow{display:flex;align-items:center;gap:12px;background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:10px 12px;margin-bottom:10px}
+  .mrow .thumb{width:54px;height:54px}
+  .mrow .nm{flex:1;min-width:0}
+  .mrow .nm b{color:var(--miku-deep)}
+  .mrow .nm small{display:block;color:var(--text-soft)}
+  .mrow .price{font-weight:800;color:var(--miku-pink-d);margin-right:6px}
+  /* 開關 */
+  .switch{position:relative;width:52px;height:30px;flex:none}
+  .switch input{opacity:0;width:0;height:0}
+  .slider{position:absolute;inset:0;background:#cfd9da;border-radius:30px;transition:.2s;cursor:pointer}
+  .slider:before{content:"";position:absolute;width:24px;height:24px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+  .switch input:checked + .slider{background:var(--miku-teal)}
+  .switch input:checked + .slider:before{transform:translateX(22px)}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px}
+  .stat{background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:18px}
+  .stat .k{color:var(--text-soft);font-size:13px;font-weight:700}
+  .stat .v{font-size:28px;font-weight:800;color:var(--miku-deep);margin-top:4px}
+  .bar-row{display:flex;align-items:center;gap:10px;margin:7px 0}
+  .bar-row .lbl{width:120px;font-size:13px;color:var(--text)}
+  .bar-track{flex:1;background:var(--miku-light);border-radius:8px;height:18px;overflow:hidden}
+  .bar-fill{height:100%;background:linear-gradient(90deg,var(--miku-teal),var(--miku-pink));border-radius:8px}
+  .bar-row .val{width:64px;text-align:right;font-weight:700;font-size:13px;color:var(--miku-deep)}
+  .langgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .photo-prev{width:100%;height:140px;border-radius:12px;background:repeating-linear-gradient(45deg,#f3f9fa,#f3f9fa 9px,#eaf4f5 9px,#eaf4f5 18px) center/cover no-repeat;display:flex;align-items:center;justify-content:center;margin-bottom:8px;border:1px dashed var(--miku-line)}
+  .photo-prev span{font-size:15px;font-weight:800;color:#9bb3b8;transform:rotate(-6deg)}
+  .reftag{font-size:10px;font-weight:700;color:var(--miku-grey);background:var(--miku-light);padding:1px 6px;border-radius:6px;letter-spacing:.5px}
+  .zhref{font-size:11px;color:var(--miku-teal-d);margin-top:4px;font-weight:600;word-break:break-all;line-height:1.35}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="../index.html"><img class="logo" src="../assets/taotao_logo.png" alt="TaoTao"> TaoTao POS</a>
+  <span class="pill" style="background:rgba(255,255,255,.16)">後台</span>
+  <div class="spacer"></div>
+  <span class="pill" id="modePill">…</span>
+</div>
+
+<div class="wrap">
+  <div class="subtabs">
+    <button data-v="menu" class="active">🍽️ 菜單管理</button>
+    <button data-v="board">🖼️ 菜單看板</button>
+    <button data-v="promo">🎟️ 優惠折扣</button>
+    <button data-v="resv">📅 訂位管理</button>
+    <button data-v="report">📊 營運報表</button>
+    <button data-v="settings">⚙️ 設定</button>
+  </div>
+
+  <section class="view active" id="v-menu">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn primary" id="addItem">＋ 新增品項</button>
+      <button class="btn ghost sm" id="addCat">＋ 新增分類</button>
+      <button class="btn deep sm" id="aiAll">一鍵 AI 翻譯全菜單</button>
+      <input id="menuSearch" placeholder="🔍 搜尋菜色…" style="max-width:220px;margin-left:auto">
+    </div>
+    <div id="menuList"></div>
+  </section>
+
+  <section class="view" id="v-board">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn primary" id="addPhoto">＋ 上傳菜單照片</button>
+      <span class="tag grey">上傳的照片會顯示在「線上訂位 → 菜單」分頁</span>
+    </div>
+    <div id="boardList" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))"></div>
+  </section>
+
+  <section class="view" id="v-promo">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn primary" id="addDisc">＋ 新增折扣</button>
+      <span class="tag grey">結帳時可按「折扣」鍵套用，折抵金額會列入明細</span>
+    </div>
+    <div id="discList"></div>
+  </section>
+
+  <section class="view" id="v-resv">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn primary" id="addResv">＋ 新增訂位</button>
+      <input type="date" id="resvDate" style="max-width:170px">
+      <button class="btn ghost sm" id="resvClear">全部</button>
+      <span class="tag grey">可確認 / 取消 / 安排桌次與併桌 / 備註</span>
+    </div>
+    <div id="resvList"></div>
+  </section>
+
+  <section class="view" id="v-report">
+    <h2 style="margin:0 0 14px;color:var(--miku-deep)">今日營運 <span class="tag teal" id="today"></span></h2>
+    <div class="stat-grid" id="statGrid"></div>
+    <div class="card" style="margin-bottom:16px">
+      <h3 style="margin:0 0 12px;color:var(--miku-deep)">熱銷排行</h3>
+      <div id="topSellers"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 12px;color:var(--miku-deep)">時段分布 (訂單數)</h3>
+      <div id="hourly"></div>
+    </div>
+  </section>
+
+  <section class="view" id="v-settings">
+    <div class="card" id="settingsCard"></div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/i18n.js"></script>
+<script src="../assets/js/db.js"></script>
+<script src="../assets/js/util.js"></script>
+<script src="../assets/js/admin.js"></script>
+</body>
+</html>

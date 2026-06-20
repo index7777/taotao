@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+.vercel
+.env
+.env.local
+*.log
+
+# 工作/參考檔 (不需進版控)
+memo.txt
+Hatsune_Miku_V6.png
+pos/menu.jpg
+pos/taotao_logo.jpg

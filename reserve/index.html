@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>線上訂位 — 濤濤鮮魚舖</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#16404D">
+<link rel="icon" href="../assets/icon-192.png">
+<link rel="apple-touch-icon" href="../assets/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/theme.css">
+<style>
+  body{background:var(--bg)}
+  .wrap{max-width:600px;margin:0 auto;padding-bottom:40px}
+  .hero{background:linear-gradient(120deg,var(--miku-deep),var(--miku-teal-d));color:#fff;padding:16px}
+  .hrow{display:flex;align-items:flex-start;gap:12px}
+  .hrow .logo{height:50px;width:50px;border-radius:11px;background:#fff;padding:3px;object-fit:contain;flex:none}
+  .hname{font-weight:800;font-size:18px}
+  .hsub{font-size:12px;opacity:.9;margin-top:2px}
+  .hsoc{display:flex;gap:7px;margin-left:auto}
+  .sic{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25)}
+  .sic:hover{background:#fff;color:var(--miku-deep)}
+  .slogan{margin-top:10px;font-size:12.5px;line-height:1.7;font-weight:500;white-space:pre-line;
+    background:linear-gradient(90deg,#fff,#bff5f3,#ffd6ea,#fff);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% auto;animation:shimmer 6s linear infinite}
+  @keyframes shimmer{to{background-position:200% center}}
+  .tabs{position:sticky;top:0;z-index:15;display:flex;background:#fff;box-shadow:0 4px 12px rgba(22,64,77,.06)}
+  .tabs button{flex:1;padding:13px 4px;font-weight:700;font-size:14px;color:var(--text-soft);border-bottom:3px solid transparent}
+  .tabs button.active{color:var(--miku-teal-d);border-bottom-color:var(--miku-teal)}
+  .tabview{display:none;padding:16px} .tabview.active{display:block}
+  h3.sec{margin:0 0 12px;color:var(--miku-deep);font-size:16px}
+  .info-row{display:flex;gap:8px;padding:7px 0;font-size:14px;border-bottom:1px dashed var(--miku-line)}
+  .info-row .k{color:var(--text-soft);min-width:56px;font-weight:700}
+  .info-row.closed{color:var(--danger);font-weight:700}
+  /* 月曆 */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .cal-head button{width:38px;height:38px;border-radius:10px;background:var(--miku-light);color:var(--miku-deep);font-size:20px;font-weight:800}
+  .cal-head button:disabled{opacity:.3}
+  .cal-title{font-weight:800;color:var(--miku-deep);font-size:16px}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .cal-dow{text-align:center;font-size:12px;color:var(--text-soft);font-weight:700;padding:4px 0}
+  .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:10px;font-weight:700;font-size:15px;background:#fff;border:1.5px solid var(--miku-line);color:var(--miku-deep);cursor:pointer}
+  .cal-day.empty{background:none;border:0;cursor:default}
+  .cal-day.off{background:#f0f3f4;color:#c2ccce;border-color:transparent;cursor:not-allowed;text-decoration:line-through}
+  .cal-day.sel{background:var(--miku-teal);border-color:var(--miku-teal);color:#063a3d}
+  .hint{font-size:12px;color:var(--text-soft);margin:8px 2px}
+  .slots{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .slot{padding:9px 14px;border-radius:10px;border:1.5px solid var(--miku-line);background:#fff;font-weight:700;color:var(--miku-deep);font-size:14px}
+  .slot.sel{background:var(--miku-pink);border-color:var(--miku-pink);color:#fff}
+  .party{display:flex;gap:8px;flex-wrap:wrap}
+  .party button{flex:1;min-width:52px;padding:11px 0;border-radius:10px;border:1.5px solid var(--miku-line);background:#fff;font-weight:700;color:var(--miku-deep)}
+  .party button.active{background:var(--miku-teal);border-color:var(--miku-teal);color:#063a3d}
+  .notice{padding:11px 13px;border-radius:11px;font-size:13.5px;font-weight:600;margin-bottom:12px}
+  .notice.warn{background:#fdf1de;color:#b9791f}
+  .notice.bad{background:#fbe6e1;color:var(--danger)}
+  /* 菜單分頁 */
+  .m-cat{font-weight:800;color:var(--miku-deep);margin:16px 2px 8px;font-size:15px}
+  .m-item{display:flex;gap:12px;background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:10px;margin-bottom:10px}
+  .m-item .thumb{width:70px;height:70px}
+  .m-item .info{flex:1;min-width:0}
+  .m-item h4{margin:0;font-size:15px;color:var(--miku-deep)}
+  .m-item p{margin:2px 0 0;font-size:12.5px;color:var(--text-soft)}
+  .m-item .pr{font-weight:800;color:var(--miku-pink-d);margin-top:4px}
+  .m-item.off{opacity:.55}
+  .mphoto{border-radius:14px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:14px;background:#fff}
+  .mphoto img{width:100%;display:block}
+  .mphoto .cap{padding:10px 12px}
+  .mphoto .cap b{color:var(--miku-deep)}
+  .mphoto .cap p{margin:4px 0 0;color:var(--text-soft);font-size:13px;line-height:1.5}
+  .mapbox{width:100%;height:230px;border:0;border-radius:14px;box-shadow:var(--shadow)}
+  .mapsec{padding:0 16px 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="hrow">
+      <img class="logo" src="../assets/taotao_logo.png" alt="">
+      <div>
+        <div class="hname" id="sName">濤濤鮮魚舖</div>
+        <div class="hsub" id="sSub">線上訂位</div>
+      </div>
+      <div class="hsoc" id="sSocial"></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button data-t="book" class="active">訂位</button>
+    <button data-t="info">店家資訊</button>
+    <button data-t="menu">菜單</button>
+  </div>
+
+  <!-- 訂位 -->
+  <section class="tabview active" id="t-book">
+    <div id="resNotice"></div>
+    <div id="resForm">
+      <h3 class="sec">選擇日期</h3>
+      <div class="cal-head">
+        <button id="calPrev">‹</button>
+        <div class="cal-title" id="calTitle"></div>
+        <button id="calNext">›</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="hint">僅提供今日起 <b>3 個月內</b> 的訂位；灰色日期（過去日／公休日）無法選擇。</div>
+
+      <div id="afterDate" class="hidden">
+        <h3 class="sec" style="margin-top:18px">選擇時間</h3>
+        <div class="slots" id="slots"></div>
+        <h3 class="sec" style="margin-top:18px">訂位資料</h3>
+        <div class="field"><label>姓名</label><input id="r_name" placeholder="您的稱呼"></div>
+        <div class="field"><label>電話</label><input id="r_phone" type="tel" placeholder="聯絡電話"></div>
+        <div class="field"><label>人數</label><div class="party" id="r_party"></div></div>
+        <div class="field"><label>備註 (可留白)</label><input id="r_note" placeholder="例如：靠窗、慶生"></div>
+        <button class="btn pink block lg" id="r_submit">送出訂位</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 店家資訊 -->
+  <section class="tabview" id="t-info">
+    <h3 class="sec">店家資訊</h3>
+    <div id="storeInfo"></div>
+  </section>
+
+  <!-- 菜單 -->
+  <section class="tabview" id="t-menu">
+    <div id="menuPhotos"></div>
+    <div id="menuList"></div>
+  </section>
+
+  <!-- 位置與導航 (置底) -->
+  <div class="mapsec">
+    <h3 class="sec">位置與導航</h3>
+    <iframe class="mapbox" id="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <a class="btn deep block" id="navBtn" target="_blank" rel="noopener" style="margin-top:10px">開啟 Google Map 導航</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/i18n.js"></script>
+<script src="../assets/js/db.js"></script>
+<script src="../assets/js/util.js"></script>
+<script src="../assets/js/reserve.js"></script>
+</body>
+</html>

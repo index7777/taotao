@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>前台 POS — TaoTao POS</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#16404D">
+<link rel="icon" href="../assets/icon-192.png">
+<link rel="apple-touch-icon" href="../assets/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/theme.css">
+<style>
+  body{padding-bottom:70px}
+  .tabs{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;background:#fff;
+    box-shadow:0 -4px 18px rgba(22,64,77,.10);padding:6px}
+  .tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px;
+    border-radius:12px;color:var(--text-soft);font-weight:700;font-size:12px}
+  .tabs button .ic{font-size:20px}
+  .tabs button.active{background:var(--miku-light);color:var(--miku-teal-d)}
+  .tabs button .badge{position:absolute;transform:translate(14px,-6px);background:var(--miku-pink);color:#fff;
+    font-size:10px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+  .wrap{max-width:1200px;margin:0 auto;padding:16px}
+  .view{display:none} .view.active{display:block}
+
+  /* 店內平面圖座位 */
+  .floorplan{position:relative;width:100%;max-width:540px;margin:0 auto;padding-top:108%;
+    background:linear-gradient(160deg,#fbffff,#eef7f8);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;
+    border:1px solid var(--miku-line)}
+  .fp-inner{position:absolute;inset:0}
+  .fseat,.fixture{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:12px}
+  .fseat{cursor:pointer;flex-direction:column;gap:1px;font-weight:800;
+    background:var(--miku-teal);color:#063a3d;border:2px solid rgba(255,255,255,.5);
+    box-shadow:0 4px 12px rgba(18,198,206,.30);transition:.15s}
+  .fseat:hover{transform:scale(1.04)}
+  .fseat .lbl{font-size:min(5vw,22px);line-height:1}
+  .fseat .cap{font-size:9px;font-weight:700;opacity:.85}
+  .fseat .rt{font-size:9px;font-weight:800;background:rgba(255,255,255,.35);padding:0 4px;border-radius:6px}
+  .fseat.occupied{background:var(--miku-pink);color:#fff;box-shadow:0 4px 12px rgba(232,76,138,.35)}
+  .fseat.merged{outline:3px dashed var(--miku-pink);outline-offset:1px}
+  .mbadge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--miku-pink);color:#fff;font-size:9px;font-weight:800;padding:1px 6px;border-radius:999px;white-space:nowrap}
+  .fseat.reserved{background:var(--warn);color:#3a2a00}
+  .fixture{background:#6E818C;color:#fff;font-size:12px;font-weight:700;letter-spacing:1px;text-align:center;line-height:1.2;padding:2px}
+  .fixture.bar{writing-mode:vertical-rl;letter-spacing:3px;background:#56707d;font-size:15px}
+  .fixture.toilet{background:none;color:#56707d;border-top:3px solid #8aa0ab;border-bottom:3px solid #8aa0ab;border-radius:0;font-weight:800}
+  .fixture.door{background:none;color:var(--miku-deep);border-left:3px solid var(--miku-deep);border-right:3px solid var(--miku-deep);border-radius:0;font-weight:800}
+  .legend{display:flex;gap:14px;justify-content:center;margin:12px 0 0;flex-wrap:wrap;font-size:13px;color:var(--text-soft)}
+  .legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:5px}
+
+  /* 點餐畫面 */
+  .order-layout{display:grid;grid-template-columns:1fr 360px;gap:16px;align-items:start}
+  @media(max-width:860px){ .order-layout{grid-template-columns:1fr} }
+  .cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px}
+  .cats button{white-space:nowrap;padding:8px 14px;border-radius:999px;background:#fff;
+    border:1.5px solid var(--miku-line);font-weight:700;color:var(--text-soft)}
+  .cats button.active{background:var(--miku-teal);border-color:var(--miku-teal);color:#06343f}
+  .menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .mcard{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:12px;cursor:pointer;transition:.15s;border:2px solid transparent}
+  .mcard:hover{border-color:var(--miku-teal)}
+  .mcard.off{opacity:.5;cursor:not-allowed}
+  .mcard .thumb{width:100%;height:84px;margin-bottom:8px}
+  .mcard h4{margin:0;font-size:14px;line-height:1.35;color:var(--miku-deep)}
+  .mcard .price{margin-top:4px;font-weight:800;color:var(--miku-pink-d)}
+  .panel{position:sticky;top:16px}
+  .ticket{background:#fff;border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .ticket .thead{padding:14px 16px;background:var(--miku-deep);color:#fff;display:flex;align-items:center;gap:8px}
+  .ticket .titems{max-height:46vh;overflow:auto;padding:8px 0}
+  .ti{display:flex;align-items:center;gap:8px;padding:8px 16px}
+  .ti .nm{flex:1;font-size:14px}
+  .ti .nm small{display:block;color:var(--text-soft)}
+  .stepper{display:flex;align-items:center;gap:6px}
+  .stepper button{width:28px;height:28px;border-radius:8px;background:var(--miku-light);color:var(--miku-deep);font-weight:800;font-size:16px}
+  .ticket .tsum{padding:14px 16px;border-top:1px dashed var(--miku-line)}
+  .sumrow{display:flex;justify-content:space-between;margin:4px 0;font-size:14px;color:var(--text-soft)}
+  .sumrow.total{font-size:19px;font-weight:800;color:var(--miku-deep);margin-top:8px}
+  .ticket .tact{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+  .ordrow{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fff;border-radius:12px;box-shadow:var(--shadow);margin-bottom:10px}
+  .ordrow .meta{flex:1}
+  .ordrow .meta b{color:var(--miku-deep)}
+  .ordrow .meta small{display:block;color:var(--text-soft)}
+  .seg{display:inline-flex;background:var(--miku-light);border-radius:10px;padding:3px}
+  .seg button{padding:6px 12px;border-radius:8px;font-weight:700;font-size:13px;color:var(--miku-deep)}
+  .seg button.active{background:#fff;box-shadow:var(--shadow)}
+  .party{display:flex;gap:8px;flex-wrap:wrap}
+  .party button{flex:1;min-width:50px;padding:11px 0;border-radius:10px;border:1.5px solid var(--miku-line);background:#fff;font-weight:700;color:var(--miku-deep)}
+  .party button.active{background:var(--miku-teal);border-color:var(--miku-teal);color:#063a3d}
+  .wrow2{display:flex;align-items:center;gap:14px;background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:12px 14px;margin-bottom:10px}
+  .wrow2 .num{font-size:24px;font-weight:800;color:var(--miku-deep);letter-spacing:1px;min-width:64px}
+  .wrow2 .meta{flex:1} .wrow2 .meta b{color:var(--miku-deep)} .wrow2 .meta small{display:block;color:var(--text-soft)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="../index.html"><img class="logo" src="../assets/taotao_logo.png" alt="TaoTao"> TaoTao POS</a>
+  <span class="pill" style="background:rgba(255,255,255,.16)">前台</span>
+  <div class="spacer"></div>
+  <button class="pill" id="voiceBtn" style="background:rgba(255,255,255,.16);cursor:pointer">🔊 通知語音：關</button>
+  <span class="pill" id="modePill">…</span>
+</div>
+
+<div class="wrap">
+  <!-- 座位視圖 -->
+  <section class="view active" id="v-seats">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+      <h2 style="margin:0;color:var(--miku-deep)">座位狀態</h2>
+      <span class="tag teal">空位 <span id="freeCount">0</span></span>
+      <span class="tag pink">用餐中 <span id="busyCount">0</span></span>
+      <div class="spacer" style="flex:1"></div>
+      <button class="btn deep sm" id="mergeBtn">⛓ 併桌</button>
+      <button class="btn pink sm" id="takeoutBtn">＋ 外帶單</button>
+    </div>
+    <div class="floorplan" id="floorPlan"></div>
+    <div class="legend">
+      <span><i style="background:var(--miku-teal)"></i>空位</span>
+      <span><i style="background:var(--miku-pink)"></i>用餐中</span>
+      <span><i style="background:#6E818C"></i>設施</span>
+      <span>1–5 吧台單人席 · 6–10 四人桌</span>
+    </div>
+    <div id="reserveHint" style="margin-top:18px"></div>
+  </section>
+
+  <!-- 點餐視圖 -->
+  <section class="view" id="v-order">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <button class="btn ghost sm" id="backSeats">← 座位</button>
+      <h2 style="margin:0;color:var(--miku-deep)" id="orderTitle">點餐</h2>
+    </div>
+    <div class="order-layout">
+      <div>
+        <div class="cats" id="catBar"></div>
+        <div class="menu-grid" id="menuGrid"></div>
+      </div>
+      <div class="panel">
+        <div class="ticket">
+          <div class="thead">🧾 <span id="ticketTitle">本桌訂單</span></div>
+          <div class="titems" id="ticketItems"></div>
+          <div class="tsum" id="ticketSum"></div>
+          <div class="tact" id="ticketAct"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 訂單 / 出單視圖 -->
+  <section class="view" id="v-orders">
+    <h2 style="margin:0 0 14px;color:var(--miku-deep)">進行中訂單</h2>
+    <div id="ordersList"></div>
+  </section>
+
+  <!-- 候位 -->
+  <section class="view" id="v-wait">
+    <h2 style="margin:0 0 12px;color:var(--miku-deep)">候位登記</h2>
+    <div class="card" style="margin-bottom:18px">
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field" style="margin:0"><label>姓名</label><input id="wName" placeholder="客人稱呼"></div>
+        <div class="field" style="margin:0"><label>電話</label><input id="wPhone" type="tel" placeholder="選填"></div>
+      </div>
+      <div class="field" style="margin:12px 0 0"><label>人數</label><div class="party" id="wParty"></div></div>
+      <button class="btn primary block lg" id="wAdd" style="margin-top:14px">完成候位登記（取號）</button>
+    </div>
+    <h2 style="margin:0 0 12px;color:var(--miku-deep)">候位中 <span class="tag teal" id="waitCount">0</span>
+      <a class="btn ghost sm" href="../wait/index.html" target="_blank" style="margin-left:8px">開啟候位看板</a></h2>
+    <div id="waitList"></div>
+  </section>
+</div>
+
+<div class="tabs">
+  <button data-v="seats" class="active"><span class="ic">🪑</span>座位</button>
+  <button data-v="order"><span class="ic">🍜</span>點餐</button>
+  <button data-v="orders"><span class="ic">📋</span>訂單<span class="badge hidden" id="ordBadge">0</span></button>
+  <button data-v="wait"><span class="ic">⏳</span>候位<span class="badge hidden" id="waitBadge">0</span></button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/i18n.js"></script>
+<script src="../assets/js/db.js"></script>
+<script src="../assets/js/util.js"></script>
+<script src="../assets/js/pos.js"></script>
+</body>
+</html>
